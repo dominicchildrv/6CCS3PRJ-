@@ -2,6 +2,7 @@
 
 from graph import Graph
 from booleanFormula import BooleanFormula
+from graphConverter import cnf_to_graph
 
 graph = Graph()
 
@@ -27,4 +28,9 @@ cnf.add_clause("A","D", "B")
 
 cnf.print_formula()
 
+
 cnf.print_clause_list()
+
+graph2 = cnf_to_graph(cnf)
+
+graph2.display_graph()

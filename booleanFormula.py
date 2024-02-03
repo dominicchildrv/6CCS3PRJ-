@@ -11,6 +11,7 @@ class BooleanFormula:
         clause = list(literals)
         if clause not in self.clauses:
             self.clauses.append(clause)
+    
 
     def print_formula(self):
         # Print each clause with AND between them
@@ -18,3 +19,6 @@ class BooleanFormula:
 
     def print_clause_list(self):
         print(self.clauses)
+
+    def return_clause_list(self):
+        return self.clauses

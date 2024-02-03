@@ -1,3 +1,0 @@
-
-def GNFEncoding(formula):
-    pass
