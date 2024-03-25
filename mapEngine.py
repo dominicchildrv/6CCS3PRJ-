@@ -1,4 +1,6 @@
 
+from graph import Graph
+
 class PacmanMap:
 
     def __init__(self) -> None:
@@ -30,7 +32,7 @@ class PacmanMap:
         self.tail.set_tail(self.end)
         self.end.set_head(self.tail)
 
-    def return_map(self):
+    def return_map(self) -> list:
         map_sequence = [self.start]
         current_gadget = self.start
 
@@ -42,7 +44,7 @@ class PacmanMap:
     
     
     
-    def max_rooms_in_connection(self):
+    def max_rooms_in_connection(self) -> int:
         max_rooms = 0
         current_gadget = self.start
 
@@ -181,7 +183,7 @@ class RoomGadget:
     
 
 
-def generate_map(graph):
+def generate_map(graph: Graph) -> PacmanMap:
     pacman_map = PacmanMap()
     
     # Step 1: Create ConnectionGadget instances for each vertex

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from mapEngine import *
+from mapToLayout import *
 
 map = PacmanMap()
 
@@ -16,3 +17,14 @@ map.set_end()
 list = map.return_map()
 
 print(list)
+
+
+layout = Layout(map)
+
+string = layout.return_layout()
+
+print(string)
+
+print(layout.maxWidth)
+print(layout.maxRooms)
+

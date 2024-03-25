@@ -52,3 +52,8 @@ for item in list:
     print(item)
 
 
+
+layout2 = Layout(map, 4)
+
+print(layout2.return_layout())
+
