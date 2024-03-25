@@ -10,10 +10,9 @@ graph = Graph()
 
 graph.add_vertex("A")
 graph.add_vertex("B")
-graph.add_vertex("C")
+
 
 graph.add_edge("A", "B")
-graph.add_edge("C", "B")
 
 graph.display_graph()
 
@@ -53,7 +52,7 @@ for item in list:
 
 
 
-layout2 = Layout(map, 4)
+layout2 = Layout(map, 1)
 
 print(layout2.return_layout())
 
