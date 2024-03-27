@@ -1,17 +1,28 @@
 from mapEngine import *
 import random
+import os
+from database import PacmanDatabase
+
 
 
 class Layout:
 
-    def __init__(self, map: PacmanMap, ghosts: int) -> None:
+    def __init__(self, map: PacmanMap, ghosts: int, db:PacmanDatabase, name: str) -> None:
 
+        self.name = name
+        self.db = db 
         if ghosts > 4:
             raise ValueError("A maximum of 4 ghosts are allowed.")
         self.map = map
         self.layout = ''
-        self.maxRooms = map.max_rooms_in_connection()
-        self.maxWidth = self.get_width()
+        if map.max_rooms_in_connection() == 0:
+            self.maxRooms =1
+        else:
+            self.maxRooms = map.max_rooms_in_connection()
+        if self.get_width() == 0:
+            self.maxWidth = 1
+        else:
+            self.maxWidth = self.get_width()
         self.numOfGhosts = ghosts
         self.generate_layout()  # Automatically generate the layout upon initialization
 
@@ -37,6 +48,7 @@ class Layout:
 
         self.add_pacman()
         self.add_ghosts()
+
 
     def add_start(self):
         self.layout += '%' * self.maxWidth + '\n'
@@ -112,3 +124,46 @@ class Layout:
 
         # Reassemble the layout from the modified lines list
         self.layout = '\n'.join(lines) + '\n'
+
+    
+
+    def save_layout_to_file(self):
+        # Define the path to the file
+        file_path = os.path.join('pacman_utils', 'layouts', self.name + '.lay')
+        
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        # Open the file for writing (overwrites if exists)
+        with open(file_path, 'w') as file:
+            file.write(self.layout)
+
+        print(f"Layout saved to {file_path}.")
+
+    
+    def save_layout_to_db(self):
+        """Save the layout to the database with ghost and Pacman speeds."""
+        layout_id = self.db.insert_layout(self.name, self.numOfGhosts)
+        print(f"Inserted layout with ID {layout_id}")
+
+    def save_layout(self):
+
+        #Update the layout name to avoid duplicates by appending a number to the name
+        original_name = self.name
+        i = 1
+        while self.db.layout_name_exists(self.name):
+            self.name = f"{original_name}{i}"
+            i += 1
+
+        self.save_layout_to_file()
+        self.save_layout_to_db()
+
+    
+    def get_ghosts(self) -> int:
+
+        return self.numOfGhosts
+    
+    def get_name(self) -> str:
+
+        return self.name
+

@@ -5,6 +5,7 @@ from booleanFormula import BooleanFormula
 from graphConverter import cnf_to_graph
 from mapEngine import *
 from mapToLayout import *
+from database import PacmanDatabase
 
 graph = Graph()
 
@@ -52,7 +53,17 @@ for item in list:
 
 
 
-layout2 = Layout(map, 1)
+db = PacmanDatabase('pacman_layouts.db')
+
+layout2 = Layout(map2, 4, db, 'smallMap')
+
+layout2.save_layout()
 
 print(layout2.return_layout())
 
+# Retrieve and print a layout
+layout = db.get_layout(layout2.get_name())
+if layout:
+    print(f"Retrieved layout: {layout}")
+else:
+    print("Layout not found.")
