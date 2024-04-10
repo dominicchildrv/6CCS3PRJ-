@@ -23,7 +23,10 @@ class PacmanDatabase:
         CREATE TABLE IF NOT EXISTS layouts (
             id integer PRIMARY KEY,
             layout_name text NOT NULL,
-            layout_ghosts int NOT NULL
+            layout_ghosts int NOT NULL,
+            high_score int DEFAULT 0,
+            last_score int DEFAULT 0,
+            beaten boolean DEFAULT 0
         ); """
         try:
             c = self.conn.cursor()
@@ -72,3 +75,28 @@ class PacmanDatabase:
         cur.execute(sql, (id,))
         self.conn.commit()
         return cur.rowcount  # Returns the number of rows deleted
+    
+    def update_high_score(self, layout_name, new_high_score):
+        """Update the high score for a specific layout."""
+        sql = '''UPDATE layouts SET high_score = ? WHERE layout_name = ?'''
+        cur = self.conn.cursor()
+        cur.execute(sql, (new_high_score, layout_name))
+        self.conn.commit()
+        return cur.rowcount
+    
+    def update_last_score(self, layout_name, score):
+        """Update the high score for a specific layout."""
+        sql = '''UPDATE layouts SET last_score = ? WHERE layout_name = ?'''
+        cur = self.conn.cursor()
+        cur.execute(sql, (score, layout_name))
+        self.conn.commit()
+        return cur.rowcount
+    
+    def beaten_level(self, layout_name):
+        """Mark a layout as beaten."""
+        sql = '''UPDATE layouts SET beaten = 1 WHERE layout_name = ?'''
+        cur = self.conn.cursor()
+        cur.execute(sql, (layout_name,))
+        self.conn.commit()
+        return cur.rowcount  # Returns the number of rows updated
+

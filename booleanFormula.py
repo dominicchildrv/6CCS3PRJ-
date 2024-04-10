@@ -5,6 +5,8 @@ class BooleanFormula:
     def __init__(self):
         self.clauses = []
 
+
+    # Adds a clause to the formula
     def add_clause(self, *literals):
         valid_literals = [lit for lit in literals if self.validate_literal(lit)]
         if not valid_literals:
@@ -13,10 +15,10 @@ class BooleanFormula:
         if clause not in self.clauses:
             self.clauses.append(clause)
             return True  # Clause added successfully
-        return False  # Clause was not added (possibly a duplicate)
+        return False  # Clause was not added
 
     def validate_literal(self, literal):
-        # Updated validation: a literal must contain at least one alphabetic character
+        # literal must contain at least one alphabetic character
         # and may optionally start with '~' and include numbers.
         if re.match(r'^~?[A-Za-z]+\w*$', literal):
             return True

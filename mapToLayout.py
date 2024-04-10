@@ -4,7 +4,7 @@ import os
 from database import PacmanDatabase
 
 
-
+# Class for layouts, which represent and hold information about the Pacman maze
 class Layout:
 
     def __init__(self, map: PacmanMap, ghosts: int, db:PacmanDatabase, name: str) -> None:
@@ -26,6 +26,8 @@ class Layout:
         self.numOfGhosts = ghosts
         self.generate_layout()  # Automatically generate the layout upon initialization
 
+
+    # Generates the layout string so a .lay file can be made and saved
     def generate_layout(self):
         # Add the start of the map layout
         self.add_start()
@@ -50,9 +52,11 @@ class Layout:
         self.add_ghosts()
 
 
+    # Add first layer of walls
     def add_start(self):
         self.layout += '%' * self.maxWidth + '\n'
 
+    # Creates sets of connected rooms filled with pellets
     def add_connection(self, numOfRooms: int):
         baseLayer = '%...' * numOfRooms + (self.maxWidth - len('%...' * numOfRooms)) * '%' 
         lowerLayer = '%' + ('...' * numOfRooms) + ('.' * (numOfRooms - 1))
@@ -60,11 +64,14 @@ class Layout:
         lowerLayer += lowerLayerPadding
         self.layout += baseLayer + '\n' + lowerLayer + '\n'
 
+    # Creates an empty corridor where ghosts can spawn
+    # Also places a power pellet (token) at the entrance
     def add_tollRoad(self):
         topLayer = '%' * 2 + 'o' + (self.maxWidth - 3) * '%'
         midLayer = '%' + ' ' * (self.maxWidth - 2) + '%'
-        self.layout += topLayer + '\n' + midLayer + '\n' + midLayer + '\n'
+        self.layout += topLayer + '\n' + midLayer + '\n'
 
+    # Add the last layer of walls
     def add_end(self):
         self.layout += '%' * self.maxWidth + '\n'
 
@@ -76,6 +83,8 @@ class Layout:
         # Return the generated layout
         return self.layout
     
+
+    # Function to add Pacman to the top of the layout
     def add_pacman(self):
         # Split the current layout into lines
         lines = self.layout.splitlines()
@@ -88,19 +97,20 @@ class Layout:
                 # Replace character with 'P', preserving the rest of the line
                 lines[1] = lines[1][:2] + 'P' + lines[1][3:]
             else:
-                # If the line is not long enough, it's an edge case,
-                # Handle accordingly, maybe log a warning or extend the line
+                # If the line is not long enough, it's an edge case
                 pass
 
         # Reassemble the layout from the modified lines list
         self.layout = '\n'.join(lines) + '\n'
 
 
+
+    # Function to randomly add ghosts to free spaces
     def add_ghosts(self):
         # Split the current layout into lines
         lines = self.layout.splitlines()
 
-        # Find all possible positions for placing ghosts (i.e., blank spaces)
+        # Find all possible positions for placing ghosts (empty spaces)
         blank_positions = [
             (row_idx, col_idx) 
             for row_idx, line in enumerate(lines) 
@@ -126,7 +136,7 @@ class Layout:
         self.layout = '\n'.join(lines) + '\n'
 
     
-
+    # Function that creates a file holding the layout string
     def save_layout_to_file(self):
         # Define the path to the file
         file_path = os.path.join('pacman_utils', 'layouts', self.name + '.lay')
@@ -141,8 +151,8 @@ class Layout:
         print(f"Layout saved to {file_path}.")
 
     
+    # Save the layout to the database with the name and number of ghosts
     def save_layout_to_db(self):
-        """Save the layout to the database with ghost and Pacman speeds."""
         layout_id = self.db.insert_layout(self.name, self.numOfGhosts)
         print(f"Inserted layout with ID {layout_id}")
 
@@ -166,4 +176,16 @@ class Layout:
     def get_name(self) -> str:
 
         return self.name
+    
+    def get_string_length(self):
+
+        partLayout = self.layout.split('\n')
+
+        return len(partLayout[0])
+    
+    def get_string_height(self):
+
+        partLayout = self.layout.split('\n')
+
+        return len(partLayout)
 

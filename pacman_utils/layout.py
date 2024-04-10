@@ -40,10 +40,19 @@ class Layout:
         self.processLayoutText(layoutText)
         self.layoutText = layoutText
         self.totalFood = len(self.food.asList())
+        self.name = None
         # self.initializeVisibilityMatrix()
 
     def getNumGhosts(self):
         return self.numGhosts
+    
+    def set_name(self, name):
+        
+        self.name = name
+
+    def get_name(self):
+
+        return self.name
 
     def initializeVisibilityMatrix(self):
         global VISIBILITY_MATRIX_CACHE
@@ -162,3 +171,5 @@ def tryToLoad(fullname):
         return Layout([line.strip() for line in f])
     finally:
         f.close()
+
+

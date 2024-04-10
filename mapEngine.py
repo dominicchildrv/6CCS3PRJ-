@@ -21,6 +21,8 @@ class PacmanMap:
 
         return self.tail
     
+    # adds a gadget to the map, linking the gadgets 
+    # by setting the head and tail.
     def add_to_map(self, gadget):
         
         self.tail.set_tail(gadget)
@@ -43,7 +45,7 @@ class PacmanMap:
         return map_sequence
     
     
-    
+    # Returns the max amount of rooms in a connection gadget
     def max_rooms_in_connection(self) -> int:
         max_rooms = 0
         current_gadget = self.start
@@ -108,7 +110,8 @@ class EndGadget:
 
 
 
-
+# Class for toll road gadget, placed between 
+# connection gadgets
 class TollRoadGadget:
 
     def __init__(self) -> None:
@@ -185,9 +188,17 @@ class RoomGadget:
 
 def generate_map(graph: Graph) -> PacmanMap:
     pacman_map = PacmanMap()
-    
+    first_connection = True  # Flag to check if the connection gadget is the first one being added
+
     # Step 1: Create ConnectionGadget instances for each vertex
     for vertex in graph.graph:
+        if not first_connection:
+            # Add a TollRoadGadget before adding the next ConnectionGadget if it's not the first connection
+            toll_road = TollRoadGadget()
+            pacman_map.add_to_map(toll_road)
+        else:
+            first_connection = False  # After the first connection, set this to False
+
         connection_gadget = ConnectionGadget()
         pacman_map.add_to_map(connection_gadget)
 
@@ -196,14 +207,11 @@ def generate_map(graph: Graph) -> PacmanMap:
             room_gadget = RoomGadget(name=neighbor)
             connection_gadget.add_to_body(room_gadget)
 
-        tollRoad = TollRoadGadget()
-        pacman_map.add_to_map(tollRoad)
-
-
     # Step 3: Set the end gadget after all connection gadgets are added
     pacman_map.set_end()
 
     return pacman_map
+
 
 
 

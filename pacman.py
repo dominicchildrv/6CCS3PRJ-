@@ -57,6 +57,8 @@ from pacman_utils.game import GameStateData
 from pacman_utils.util import manhattanDistance
 from pacman_utils.util import nearestPoint
 
+from database import PacmanDatabase
+
 
 ###################################################
 # YOUR INTERFACE TO THE PACMAN WORLD: A GameState #
@@ -566,6 +568,7 @@ def readCommand(argv):
 
     # Choose a layout
     args['layout'] = layout.getLayout(options.layout)
+    args['layout'].set_name(options.layout)
     if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
 
     # Choose a Pacman agent
@@ -739,6 +742,21 @@ def runGames(layout, pacman, ghosts, display, numGames, record, numTraining=0, c
         print('Scores:       ', ', '.join([str(score) for score in scores]))
         print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
         print('Record:       ', ', '.join([['Loss', 'Win'][int(w)] for w in wins]))
+
+        db = PacmanDatabase('pacman_layouts.db')
+        current_high_score = db.get_layout(layout.get_name())[3]
+
+
+
+        if scores[0] > current_high_score:
+            db.update_high_score(layout.get_name(), scores[0])
+        elif current_high_score == 0:
+            db.update_high_score(layout.get_name(), scores[0])
+
+        db.update_last_score(layout.get_name(), scores[0])
+
+        if winRate == 1:
+            db.beaten_level(layout.get_name())
 
     return games
 
