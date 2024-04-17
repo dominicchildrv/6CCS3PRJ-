@@ -3,7 +3,7 @@
 # Licensing Information:  You are free to use or extend these projects for
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
+# attribution to UC Berkeley, including a link to http://ai.berkeley.du.
 # 
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
@@ -704,6 +704,9 @@ def replayGame(layout, actions, display):
     display.finish()
 
 
+
+# THIS FUNCTION HAS BEEN EXTENDED BY DOMINIC CHILD. THE RELEVANT SECTION 
+# SECTION HAS BEEN POINTED OUT, EVERYTHING ELSE IS UC BERKELEYS.
 def runGames(layout, pacman, ghosts, display, numGames, record, numTraining=0, catchExceptions=False, timeout=30):
     # noinspection PyUnresolvedReferences
     import __main__
@@ -743,20 +746,30 @@ def runGames(layout, pacman, ghosts, display, numGames, record, numTraining=0, c
         print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
         print('Record:       ', ', '.join([['Loss', 'Win'][int(w)] for w in wins]))
 
+
+        # CODE ADDED BY DOMINIC CHILD. ALL OTHER CODE IS NOT MINE
+        # AND BELONGS TO UC BERKELEY
+
+        # Updates high score is necessary, also sets high score
+        # if none has been set (0)
+
         db = PacmanDatabase('pacman_layouts.db')
         current_high_score = db.get_layout(layout.get_name())[3]
-
-
 
         if scores[0] > current_high_score:
             db.update_high_score(layout.get_name(), scores[0])
         elif current_high_score == 0:
             db.update_high_score(layout.get_name(), scores[0])
 
+        # Updates last score in database
         db.update_last_score(layout.get_name(), scores[0])
 
+        # Sets the level to beaten if the player wins
         if winRate == 1:
             db.beaten_level(layout.get_name())
+
+
+
 
     return games
 

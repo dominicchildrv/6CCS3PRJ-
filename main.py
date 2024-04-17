@@ -11,22 +11,30 @@ import os
 
 class PacmanUI:
     def __init__(self, root, db):
+        # Set up the main window
         self.root = root
         self.db = db
         self.root.title("Pacman can be NP Hard!")
         self.root.geometry("1920x1080")
 
+         # Create a main content frame
         self.content_frame = tk.Frame(self.root)
         self.content_frame.pack(expand=True, fill='both')
 
+        # Initialize the boolean formula handler
         self.boolean_formula = BooleanFormula()
 
+        # Display the main menu
         self.show_main_menu()
 
+
+    # Clear all widgets from the content frame
     def clear_frame(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
 
+
+    # Display the main menu interface
     def show_main_menu(self):
         self.clear_frame()
 
@@ -37,7 +45,7 @@ class PacmanUI:
         self.formula_label = tk.Label(self.content_frame, text="", font=("Arial", 12), wraplength=800)
         self.formula_label.pack(pady=10)
 
-
+        # Button to add a clause to the boolean formula
         add_clause_button = tk.Button(self.content_frame, text="Add Clause to Boolean Formula", command=self.add_clause, font=("Arial", 12))
         add_clause_button.pack(pady=10)
 
@@ -46,6 +54,8 @@ class PacmanUI:
         self.layout_name_entry = tk.Entry(self.content_frame, font=("Arial", 12))
         self.layout_name_entry.pack(pady=5)
 
+
+        # Dropdown for selecting the number of ghosts
         self.ghosts_var = tk.StringVar()
         ghosts_label = tk.Label(self.content_frame, text="Ghosts:", font=("Arial", 12))
         ghosts_label.pack(pady=5)
@@ -54,25 +64,29 @@ class PacmanUI:
         ghosts_dropdown['state'] = 'readonly'  # Prevent typing a value
         ghosts_dropdown.pack(pady=5)
 
+        # Button to generate layout and reset the UI
         generate_reset_button = tk.Button(self.content_frame, text="Generate Layout & Reset", command=self.generate_and_reset_layout, font=("Arial", 12))
         generate_reset_button.pack(pady=10)
 
 
+        # Button to view saved levels in the database
         view_db_button = tk.Button(self.content_frame, text="View Levels", command=self.show_database, font=("Arial", 12))
         view_db_button.pack(pady=10)
 
         self.update_formula_label()
 
+    # Start a game in a separate thread
     def start_game(self, name):
 
         self.show_main_menu()
-        # Example function for starting the game with a specific level
         def run_game():
             command = ['python3', 'pacman.py', '-l', name]
             process = Popen(command)
             process.wait()
             self.show_main_menu()  # Return to main menu after game
 
+
+        # Disable buttons while the game is running
         for widget in self.content_frame.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.config(state="disabled")
@@ -80,6 +94,8 @@ class PacmanUI:
         game_thread = Thread(target=run_game, daemon=True)
         game_thread.start()
 
+
+    # Show the database interface for viewing, selecting, and deleting levels
     def show_database(self):
         self.clear_frame()
 
@@ -99,7 +115,7 @@ class PacmanUI:
         self.tree.column('Beaten', anchor=tk.CENTER, width=80)
 
         self.tree.heading('ID', text='ID', anchor=tk.CENTER)
-        self.tree.heading('Layout Name', text='Layout Name', anchor=tk.W)
+        self.tree.heading('Layout Name', text='Layout Name', anchor=tk.CENTER)
         self.tree.heading('Ghosts', text='Ghosts', anchor=tk.CENTER)
         self.tree.heading('High Score', text='High Score', anchor=tk.CENTER)
         self.tree.heading('Last Score', text='Last Score', anchor=tk.CENTER)
@@ -107,9 +123,10 @@ class PacmanUI:
 
         self.tree.pack(expand=True, fill='both')
 
+        # Populate the tree view with data from the database
         data = self.db.get_all_layouts()
         for row in data:
-            beaten_status = "Beaten" if row[5] == 1 else "Not Beaten"  # Adjust this index if necessary
+            beaten_status = "Beaten" if row[5] == 1 else "Not Beaten" 
             # Update the row data with the modified 'beaten_status' before inserting it into the tree view
             modified_row = row[:5] + (beaten_status,)
             self.tree.insert('', tk.END, values=modified_row)
@@ -117,9 +134,10 @@ class PacmanUI:
         delete_button = tk.Button(self.content_frame, text="Delete Selected Level", command=self.delete_selected_level, font=("Arial", 12))
         delete_button.pack(pady=10)
 
+        # Bind double click event to start game for selected level
         def on_double_click(event):
             item = self.tree.selection()[0]
-            level_name = self.tree.item(item, 'values')[1]  # Assuming the level name is the second value
+            level_name = self.tree.item(item, 'values')[1] 
             self.start_game(level_name)
 
         self.tree.bind("<Double-1>", on_double_click)
@@ -142,6 +160,7 @@ class PacmanUI:
         formula_str = " AND ".join(["(" + " OR ".join(clause) + ")" for clause in self.boolean_formula.return_clause_list()])
         self.formula_label.config(text="Boolean Formula: " + formula_str)
 
+    # Method used to generate a layout
     def generate_and_reset_layout(self):
         layoutName = self.layout_name_entry.get().strip()  # Trim whitespace
         numOfGhosts = self.ghosts_var.get()
@@ -150,7 +169,6 @@ class PacmanUI:
         if not self.boolean_formula.clauses:
             messagebox.showwarning("Warning", "No Boolean formula provided. Please add at least one clause.")
             return
-
         # Check if layout name is provided
         if not layoutName:
             messagebox.showwarning("Warning", "A level needs a name. Please enter a name for the level.")
@@ -162,7 +180,7 @@ class PacmanUI:
 
         booleanFormula = self.boolean_formula
 
-        # Assuming cnf_to_graph, generate_map, and Layout handle the creation and saving of the layout
+        # Generate layout: cnf->graph->map->layout
         graph = cnf_to_graph(booleanFormula)
         map = generate_map(graph)
         layout = Layout(map, int(numOfGhosts), self.db, layoutName)
@@ -182,7 +200,7 @@ class PacmanUI:
         selected_item = self.tree.selection()  # Get selected item in the treeview
         if selected_item:
             item = self.tree.item(selected_item)
-            level_id, level_name, _, _, _, _ = item['values']  # Assuming the level name is the second value in the 'values' list
+            level_id, level_name, _, _, _, _ = item['values']  
             self.db.delete_layout_by_id(level_id)  # Call the method to delete layout from database
             
             # Construct the path to the layout file
@@ -202,7 +220,7 @@ class PacmanUI:
 
 
 if __name__ == "__main__":
-    db = PacmanDatabase('pacman_layouts.db')  # Ensure this is defined correctly
+    db = PacmanDatabase('pacman_layouts.db') 
     root = tk.Tk()
     app = PacmanUI(root, db)
     root.mainloop()
